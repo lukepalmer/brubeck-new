@@ -120,7 +120,8 @@ static struct MHD_Response *send_stats(struct brubeck_server *brubeck) {
                     "port", (int)ntohs(address->sin_port), "bytes_sent",
                     (json_int_t)carbon->bytes_sent));
     }
-    if (backend->type == BRUBECK_BACKEND_KAFKA) {
+#ifdef BRUBECK_HAVE_KAFKA    
+    else if (backend->type == BRUBECK_BACKEND_KAFKA) {
       struct brubeck_kafka *kafka = (struct brubeck_kafka *)backend;
       json_array_append_new(
           backends, json_pack("{s:s, s:i, s:b, s:I}", "type", "kafka",
@@ -128,6 +129,7 @@ static struct MHD_Response *send_stats(struct brubeck_server *brubeck) {
                               "connected", kafka->connected, "bytes_sent",
                               (json_int_t)kafka->bytes_sent));
     }
+#endif    
   }
 
   samplers = json_array();

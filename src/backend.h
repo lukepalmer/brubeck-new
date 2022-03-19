@@ -37,6 +37,8 @@ brubeck_backend_name(struct brubeck_backend *backend) {
 }
 
 #include "backends/carbon.h"
+#ifdef BRUBECK_HAVE_KAFKA
 #include "backends/kafka.h"
+#endif
 
 #endif

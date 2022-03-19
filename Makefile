@@ -1,6 +1,6 @@
 GIT_SHA = $(shell git rev-parse --short HEAD)
 TARGET = brubeck
-LIBS = -lm -pthread -lrt -ljansson -lrdkafka
+LIBS = -lm -pthread -lrt -ljansson
 CC = gcc
 CXX = g++
 CFLAGS = -g -Wall -O3 -Wno-strict-aliasing -Isrc -Ivendor -Ivendor/ck/include -DNDEBUG=1 -DGIT_SHA=\"$(GIT_SHA)\"
@@ -13,7 +13,6 @@ all: default
 SOURCES = \
 	src/backend.c \
 	src/backends/carbon.c \
-	src/backends/kafka.c \
 	src/bloom.c \
 	src/city.c \
 	src/histogram.c \
@@ -29,6 +28,12 @@ SOURCES = \
 	src/slab.c \
 	src/tags.c \
 	src/utils.c
+
+ifndef BRUBECK_NO_KAFKA
+	LIBS += -lrdkafka
+	SOURCES += src/backends/kafka.c
+	CFLAGS += -DBRUBECK_HAVE_KAFKA
+endif
 
 ifndef BRUBECK_NO_HTTP
 	LIBS += -lmicrohttpd

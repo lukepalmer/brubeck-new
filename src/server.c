@@ -39,11 +39,14 @@ static void update_proctitle(struct brubeck_server *server) {
         struct brubeck_carbon *carbon = (struct brubeck_carbon *)backend;
         bytes_sent += (double)carbon->bytes_sent;
         connected = connected || carbon->out_sock >= 0;
-      } else if (backend->type == BRUBECK_BACKEND_KAFKA) {
+      }
+#ifdef BRUBECK_HAVE_KAFKA      
+      else if (backend->type == BRUBECK_BACKEND_KAFKA) {
         struct brubeck_kafka *kafka = (struct brubeck_kafka *)backend;
         bytes_sent += (double)kafka->bytes_sent;
         connected = connected || kafka->connected;
       }
+#endif      
     }
     for (j = 0; j < 7 && bytes_sent >= 1024.0; ++j)
       bytes_sent /= 1024.0;
@@ -97,11 +100,15 @@ static void load_backends(struct brubeck_server *server, json_t *backends) {
     if (type && !strcmp(type, "carbon")) {
       backend = brubeck_carbon_new(server, b, server->active_backends);
       server->backends[server->active_backends++] = backend;
-    } else if (type && !strcmp(type, "kafka")) {
+    }
+#ifdef BRUBECK_HAVE_KAFKA    
+    else if (type && !strcmp(type, "kafka")) {
       backend = brubeck_kafka_new(server, b, server->active_backends);
       server->backends[server->active_backends++] = backend;
 
-    } else {
+    }
+#endif    
+    else {
       log_splunk("backend=%s event=invalid_backend", type);
     }
   }
